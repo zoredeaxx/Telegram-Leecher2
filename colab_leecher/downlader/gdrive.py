@@ -1,6 +1,5 @@
 # copyright 2023 © Xron Trix | https://github.com/Xrontrix10
 
-
 import io
 import logging
 import pickle
@@ -14,32 +13,18 @@ from googleapiclient.http import MediaIoBaseDownload
 from colab_leecher.utility.handler import cancelTask
 from colab_leecher.utility.helper import sizeUnit, getTime, speedETA, status_bar
 from colab_leecher.utility.variables import Gdrive, Messages, Paths, BotTimes, Transfer
-from google_auth_httplib2 import AuthorizedHttp
-from googleapiclient.http import build_http
-
+        
 async def build_service():
     global Gdrive
-    creds = None
-    if os.path.exists(Paths.access_token):
+    if ospath.exists(Paths.access_token):
         with open(Paths.access_token, "rb") as token:
             creds = pickle.load(token)
-    else:
-        authorized_http = AuthorizedHttp(credentials=creds, http=build_http())
-        authorized_http.http.disable_ssl_certificate_validation = True
-        Gdrive.service = build("drive", "v3", http=authorized_http, cache_discovery=False)
-
-        
-#async def build_service():
-    #global Gdrive
-    #if ospath.exists(Paths.access_token):
-        #with open(Paths.access_token, "rb") as token:
-            #creds = pickle.load(token)
             # Build the service
-            #Gdrive.service = build("drive", "v3", credentials=creds)
-    #else:
-        #await cancelTask(
-            #"token.pickle NOT FOUND ! Stop the Bot and Run the Google Drive Cell to Generate, then Try again !"
-        #)
+            Gdrive.service = build("drive", "v3", credentials=creds)
+    else:
+        await cancelTask(
+            "token.pickle NOT FOUND ! Stop the Bot and Run the Google Drive Cell to Generate, then Try again !"
+        )
 
 async def g_DownLoad(link, num):
     global start_time, down_msg
