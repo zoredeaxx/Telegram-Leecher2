@@ -34,7 +34,7 @@ async def start(client, message):
     await message.reply_text(text, reply_markup=keyboard)
 
 
-@colab_bot.on_message(filters.command("tupload") & filters.private)
+@colab_bot.on_message(filters.command("leech") & filters.private)
 async def telegram_upload(client, message):
     global BOT, src_request_msg
     BOT.Mode.mode = "leech"
@@ -45,7 +45,7 @@ async def telegram_upload(client, message):
     src_request_msg = await task_starter(message, text)
 
 
-@colab_bot.on_message(filters.command("gdupload") & filters.private)
+@colab_bot.on_message(filters.command("mirror") & filters.private)
 async def drive_upload(client, message):
     global BOT, src_request_msg
     BOT.Mode.mode = "mirror"
@@ -56,7 +56,7 @@ async def drive_upload(client, message):
     src_request_msg = await task_starter(message, text)
 
 
-@colab_bot.on_message(filters.command("drupload") & filters.private)
+@colab_bot.on_message(filters.command("dirleech") & filters.private)
 async def directory_upload(client, message):
     global BOT, src_request_msg
     BOT.Mode.mode = "dir-leech"
@@ -67,7 +67,7 @@ async def directory_upload(client, message):
     src_request_msg = await task_starter(message, text)
 
 
-@colab_bot.on_message(filters.command("ytupload") & filters.private)
+@colab_bot.on_message(filters.command("ytleech") & filters.private)
 async def yt_upload(client, message):
     global BOT, src_request_msg
     BOT.Mode.mode = "leech"
