@@ -23,6 +23,7 @@ from colab_leecher.utility.variables import (
     Paths,
 )
 
+botStartTime = time.time()
 
 def isLink(_, __, update):
     if update.text:
@@ -75,8 +76,8 @@ def getTime(seconds):
         return f"{minutes}m {seconds}s"
     else:
         return f"{seconds}s"
-
-
+        
+    
 def sizeUnit(size):
     if size > 1024 * 1024 * 1024 * 1024 * 1024:
         siz = f"{size/(1024**5):.2f} PiB"
@@ -230,8 +231,10 @@ def sysINFO():
     ram_usage = psutil.Process(os.getpid()).memory_info().rss
     disk_usage = psutil.disk_usage("/")
     cpu_usage_percent = psutil.cpu_percent()
+    currentTime = getTime(time.time() - botStartTime)
 
     string = "\n\n⌬─────「 Colab Usage 」─────⌬\n"
+    string += f"\n╭⏳ **BOT Uptime »**  __{currentTime}__" 
     string += f"\n╭🖥️ **CPU Usage »**  __{cpu_usage_percent}%__"
     string += f"\n├💽 **RAM Usage »**  __{sizeUnit(ram_usage)}__"
     string += f"\n╰💾 **DISK Free »**  __{sizeUnit(disk_usage.free)}__"
