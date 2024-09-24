@@ -45,13 +45,13 @@ async def task_starter(message, text):
     global BOT
     await message.delete()
     BOT.State.started = True
-    if BOT.State.task_going == False:
+    #if BOT.State.task_going == False:
         src_request_msg = await message.reply_text(text)
         return src_request_msg
-    else:
-        msg = await message.reply_text(
-            "I am already working ! Please wait until I finish !!"
-        )
+    #else:
+        #msg = await message.reply_text(
+            #"I am already working ! Please wait until I finish !!"
+        #)
         await sleep(15)
         await msg.delete()
         return None
