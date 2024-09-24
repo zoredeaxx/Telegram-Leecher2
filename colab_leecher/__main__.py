@@ -113,7 +113,7 @@ async def handle_url(client, message):
 
     if src_request_msg:
         await src_request_msg.delete()
-    if BOT.State.task_going == False and BOT.State.started:
+    #if BOT.State.task_going == False and BOT.State.started:
         temp_source = message.text.splitlines()
 
         # Check for arguments in message
@@ -146,7 +146,7 @@ async def handle_url(client, message):
             reply_markup=keyboard,
             quote=True,
         )
-    elif BOT.State.started:
+    else BOT.State.started:
         await message.delete()
         await message.reply_text(
             "<i>I am Already Working ! Please Wait Until I finish 😣!!</i>"
