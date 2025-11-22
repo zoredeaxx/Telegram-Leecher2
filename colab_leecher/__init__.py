@@ -1,6 +1,5 @@
 import logging
 import json
-from uvloop import install
 
 try:
     with open("/content/Telegram-Leecher/credentials.json", "r") as file:
@@ -25,5 +24,3 @@ logging.basicConfig(
 )
 
 colab_bot = None
-
-install()
