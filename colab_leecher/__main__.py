@@ -1,15 +1,16 @@
 import logging, os, asyncio
-from pyrogram import Client, filters
+from pyrogram import filters
 from datetime import datetime
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
-from colab_leecher import API_ID, API_HASH, BOT_TOKEN, OWNER
+from colab_leecher import initialize_bot, colab_bot, OWNER
+
+initialize_bot()
+
 from colab_leecher.utility.handler import cancelTask
 from colab_leecher.utility.variables import BOT, MSG, BotTimes, Paths
 from colab_leecher.utility.task_manager import taskScheduler, task_starter
 from colab_leecher.utility.helper import isLink, setThumbnail, message_deleter, send_settings
-
-colab_bot = Client("my_bot", api_id=API_ID, api_hash=API_HASH, bot_token=BOT_TOKEN)
 
 src_request_msg = None
 
@@ -310,9 +311,9 @@ async def help_command(client, message):
     await message_deleter(message, msg)
 
 async def main():
-    await colab_bot.start()
-    logging.info("Colab Leecher Started!")
-    await asyncio.Event().wait()
+    async with colab_bot:
+        logging.info("Colab Leecher Started!")
+        await asyncio.Event().wait()
 
 if __name__ == "__main__":
     try:
