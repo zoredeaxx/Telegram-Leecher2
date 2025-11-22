@@ -1,20 +1,28 @@
 import logging, os, asyncio
-from pyrogram import filters
+from pyrogram import Client, filters
 from datetime import datetime
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
-from colab_leecher import initialize_bot, colab_bot, OWNER
-
-initialize_bot()
+import colab_leecher
+from colab_leecher import API_ID, API_HASH, BOT_TOKEN, OWNER
 
 from colab_leecher.utility.handler import cancelTask
 from colab_leecher.utility.variables import BOT, MSG, BotTimes, Paths
 from colab_leecher.utility.task_manager import taskScheduler, task_starter
 from colab_leecher.utility.helper import isLink, setThumbnail, message_deleter, send_settings
 
+TempBot = Client(
+    "my_bot",
+    api_id=API_ID,
+    api_hash=API_HASH,
+    bot_token=BOT_TOKEN,
+    no_updates=True,
+    in_memory=True
+)
+
 src_request_msg = None
 
-@colab_bot.on_message(filters.command("start") & filters.private)
+@TempBot.on_message(filters.command("start") & filters.private)
 async def start(client, message):
     await message.delete()
     text = "**Hey There, 👋🏼 It's Colab Leecher**\n\n◲ I am a Powerful File Transloading Bot 🚀\n◲ I can Transfer Files To Telegram or Your Google Drive From Various Sources 🦐"
@@ -28,7 +36,7 @@ async def start(client, message):
     )
     await message.reply_text(text, reply_markup=keyboard)
 
-@colab_bot.on_message(filters.command("leech") & filters.private)
+@TempBot.on_message(filters.command("leech") & filters.private)
 async def telegram_upload(client, message):
     global BOT, src_request_msg
     BOT.Mode.mode = "leech"
@@ -36,7 +44,7 @@ async def telegram_upload(client, message):
     text = "<b>⚡ Send Me DOWNLOAD LINK(s) 🔗»</b>\n\n🦀 Follow the below pattern\n\n<code>https//linktofile1.mp4\nhttps//linktofile2.mp4\n[Custom name space.mp4]\n{Password for zipping}\n(Password for unzip)</code>"
     src_request_msg = await task_starter(message, text)
 
-@colab_bot.on_message(filters.command("mirror") & filters.private)
+@TempBot.on_message(filters.command("mirror") & filters.private)
 async def drive_upload(client, message):
     global BOT, src_request_msg
     BOT.Mode.mode = "mirror"
@@ -44,7 +52,7 @@ async def drive_upload(client, message):
     text = "<b>⚡ Send Me DOWNLOAD LINK(s) 🔗»</b>\n\n🦀 Follow the below pattern\n\n<code>https//linktofile1.mp4\nhttps//linktofile2.mp4\n[Custom name space.mp4]\n{Password for zipping}\n(Password for unzip)</code>"
     src_request_msg = await task_starter(message, text)
 
-@colab_bot.on_message(filters.command("dirleech") & filters.private)
+@TempBot.on_message(filters.command("dirleech") & filters.private)
 async def directory_upload(client, message):
     global BOT, src_request_msg
     BOT.Mode.mode = "dir-leech"
@@ -52,7 +60,7 @@ async def directory_upload(client, message):
     text = "<b>⚡ Send Me FOLDER PATH 🔗»</b>\n\n🦀 Below is an example\n\n<code>/home/user/Downloads/bot</code>"
     src_request_msg = await task_starter(message, text)
 
-@colab_bot.on_message(filters.command("ytleech") & filters.private)
+@TempBot.on_message(filters.command("ytleech") & filters.private)
 async def yt_upload(client, message):
     global BOT, src_request_msg
     BOT.Mode.mode = "leech"
@@ -60,13 +68,13 @@ async def yt_upload(client, message):
     text = "<b>⚡ Send YTDL DOWNLOAD LINK(s) 🔗»</b>\n\n🦀 Follow the below pattern\n\n<code>https//linktofile1.mp4\nhttps//linktofile2.mp4\n[Custom name space.mp4]\n{Password for zipping}</code>"
     src_request_msg = await task_starter(message, text)
 
-@colab_bot.on_message(filters.command("settings") & filters.private)
+@TempBot.on_message(filters.command("settings") & filters.private)
 async def settings(client, message):
     if message.chat.id == OWNER:
         await message.delete()
         await send_settings(client, message, message.id, True)
 
-@colab_bot.on_message(filters.reply)
+@TempBot.on_message(filters.reply)
 async def setPrefix(client, message):
     global BOT, SETTING
     if BOT.State.prefix:
@@ -80,7 +88,7 @@ async def setPrefix(client, message):
         await send_settings(client, message, message.reply_to_message_id, False)
         await message.delete()
 
-@colab_bot.on_message(filters.create(isLink) & ~filters.photo)
+@TempBot.on_message(filters.create(isLink) & ~filters.photo)
 async def handle_url(client, message):
     global BOT
     BOT.Options.custom_name = ""
@@ -122,14 +130,14 @@ async def handle_url(client, message):
         await message.delete()
         await message.reply_text("<i>I am Already Working ! Please Wait Until I finish 😣!!</i>")
 
-@colab_bot.on_callback_query()
+@TempBot.on_callback_query()
 async def handle_options(client, callback_query):
     global BOT, MSG
     if callback_query.data in ["normal", "zip", "unzip", "undzip"]:
         BOT.Mode.type = callback_query.data
         await callback_query.message.delete()
-        await colab_bot.delete_messages(chat_id=callback_query.message.chat.id, message_ids=callback_query.message.reply_to_message_id)
-        MSG.status_msg = await colab_bot.send_message(
+        await client.delete_messages(chat_id=callback_query.message.chat.id, message_ids=callback_query.message.reply_to_message_id)
+        MSG.status_msg = await client.send_message(
             chat_id=OWNER,
             text="#STARTING_TASK\n\n**Starting your task in a few Seconds...🦐**",
             reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Cancel ❌", callback_data="cancel")]]),
@@ -231,8 +239,8 @@ async def handle_options(client, callback_query):
     elif callback_query.data in ["ytdl-true", "ytdl-false"]:
         BOT.Mode.ytdl = True if callback_query.data == "ytdl-true" else False
         await callback_query.message.delete()
-        await colab_bot.delete_messages(chat_id=callback_query.message.chat.id, message_ids=callback_query.message.reply_to_message_id)
-        MSG.status_msg = await colab_bot.send_message(
+        await client.delete_messages(chat_id=callback_query.message.chat.id, message_ids=callback_query.message.reply_to_message_id)
+        MSG.status_msg = await client.send_message(
             chat_id=OWNER,
             text="#STARTING_TASK\n\n**Starting your task in a few Seconds...🦐**",
             reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Cancel ❌", callback_data="cancel")]]),
@@ -247,7 +255,7 @@ async def handle_options(client, callback_query):
     elif callback_query.data == "cancel":
         await cancelTask("User Cancelled !")
 
-@colab_bot.on_message(filters.photo & filters.private)
+@TempBot.on_message(filters.photo & filters.private)
 async def handle_image(client, message):
     msg = await message.reply_text("<i>Trying To Save Thumbnail...</i>")
     success = await setThumbnail(message)
@@ -259,7 +267,7 @@ async def handle_image(client, message):
     await asyncio.sleep(15)
     await message_deleter(message, msg)
 
-@colab_bot.on_message(filters.command("setname") & filters.private)
+@TempBot.on_message(filters.command("setname") & filters.private)
 async def custom_name(client, message):
     global BOT
     if len(message.command) != 2:
@@ -270,7 +278,7 @@ async def custom_name(client, message):
     await asyncio.sleep(15)
     await message_deleter(message, msg)
 
-@colab_bot.on_message(filters.command("zipaswd") & filters.private)
+@TempBot.on_message(filters.command("zipaswd") & filters.private)
 async def zip_pswd(client, message):
     global BOT
     if len(message.command) != 2:
@@ -281,7 +289,7 @@ async def zip_pswd(client, message):
     await asyncio.sleep(15)
     await message_deleter(message, msg)
 
-@colab_bot.on_message(filters.command("unzipaswd") & filters.private)
+@TempBot.on_message(filters.command("unzipaswd") & filters.private)
 async def unzip_pswd(client, message):
     global BOT
     if len(message.command) != 2:
@@ -292,7 +300,7 @@ async def unzip_pswd(client, message):
     await asyncio.sleep(15)
     await message_deleter(message, msg)
 
-@colab_bot.on_message(filters.command("help") & filters.private)
+@TempBot.on_message(filters.command("help") & filters.private)
 async def help_command(client, message):
     msg = await message.reply_text(
         "Send /start To Check If I am alive 🤨\n\nSend /colabxr and follow prompts to start transloading 🚀\n\nSend /settings to edit bot settings ⚙️\n\nSend /setname To Set Custom File Name 📛\n\nSend /zipaswd To Set Password For Zip File 🔐\n\nSend /unzipaswd To Set Password to Extract Archives 🔓\n\n⚠️ **You can ALWAYS SEND an image To Set it as THUMBNAIL for your files 🌄**",
@@ -311,7 +319,17 @@ async def help_command(client, message):
     await message_deleter(message, msg)
 
 async def main():
-    async with colab_bot:
+    real_bot = Client(
+        "my_bot",
+        api_id=API_ID,
+        api_hash=API_HASH,
+        bot_token=BOT_TOKEN
+    )
+
+    real_bot.add_handler(TempBot.handlers)
+    colab_leecher.colab_bot = real_bot
+    
+    async with real_bot:
         logging.info("Colab Leecher Started!")
         await asyncio.Event().wait()
 
