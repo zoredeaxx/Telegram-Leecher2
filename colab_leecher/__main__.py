@@ -1,3 +1,5 @@
+# copyright 2024 © Xron Trix | https://github.com/Xrontrix10
+
 import logging
 import os
 import asyncio
@@ -253,8 +255,11 @@ async def handle_options(client, callback_query):
         await callback_query.message.delete()
     elif data == "back":
         await send_settings(client, callback_query.message, callback_query.message.id, False)
+    
+    # --- THIS IS THE FINAL FIX ---
     elif data == "cancel":
-        await cancelTask("User Cancelled !")
+        # The 'client' object is passed from the handler's arguments
+        await cancelTask(client, "User Cancelled !")
 
 
 async def handle_image(client, message):
