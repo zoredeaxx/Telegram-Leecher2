@@ -7,7 +7,6 @@ from asyncio import sleep, get_event_loop
 from pyrogram import filters, idle
 from pyrogram.client import Client
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
-# --- KEY CHANGE: Import the handler classes ---
 from pyrogram.handlers import MessageHandler, CallbackQueryHandler
 
 from . import API_ID, API_HASH, BOT_TOKEN, OWNER
@@ -37,12 +36,11 @@ async def main():
         user_info = await colab_bot.get_me()
         logging.info(f"Bot started as {user_info.first_name} (@{user_info.username})")
         await idle()
-        logging.info("Bot stopped.")
+        
+    logging.info("Bot has been stopped.")
+
 
 def add_handlers():
-    # --- KEY CHANGE: Use MessageHandler and CallbackQueryHandler ---
-    
-    # Message Handlers
     colab_bot.add_handler(MessageHandler(start, filters.command("start") & filters.private))
     colab_bot.add_handler(MessageHandler(telegram_upload, filters.command("leech") & filters.private))
     colab_bot.add_handler(MessageHandler(drive_upload, filters.command("mirror") & filters.private))
@@ -56,13 +54,8 @@ def add_handlers():
     colab_bot.add_handler(MessageHandler(setPrefix, filters.reply))
     colab_bot.add_handler(MessageHandler(handle_url, filters.create(isLink) & ~filters.photo))
     colab_bot.add_handler(MessageHandler(handle_image, filters.photo & filters.private))
-    
-    # Callback Query Handler
     colab_bot.add_handler(CallbackQueryHandler(handle_options))
 
-
-# --- The rest of the file remains exactly the same ---
-# (All your async def functions: start, telegram_upload, etc.)
 
 src_request_msg = None
 
@@ -132,12 +125,13 @@ async def setPrefix(client, message):
 
 
 async def handle_url(client, message):
-    global BOT
+    global BOT, src_request_msg
     BOT.Options.custom_name = ""
     BOT.Options.zip_pswd = ""
     BOT.Options.unzip_pswd = ""
     if src_request_msg:
         await src_request_msg.delete()
+        src_request_msg = None
     if not BOT.State.task_going and BOT.State.started:
         temp_source = message.text.splitlines()
         for _ in range(3):
@@ -178,11 +172,11 @@ async def handle_options(client, callback_query):
             BOT.Mode.ytdl = data == "ytdl-true"
         
         await callback_query.message.delete()
-        await colab_bot.delete_messages(
+        await client.delete_messages(
             chat_id=callback_query.message.chat.id,
             message_ids=callback_query.message.reply_to_message_id,
         )
-        MSG.status_msg = await colab_bot.send_message(
+        MSG.status_msg = await client.send_message(
             chat_id=OWNER,
             text="#STARTING_TASK\n\n**Starting your task in a few Seconds...🦐**",
             reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Cancel ❌", callback_data="cancel")]])
@@ -191,7 +185,7 @@ async def handle_options(client, callback_query):
         BOT.State.started = False
         BotTimes.start_time = datetime.now()
         loop = get_event_loop()
-        BOT.TASK = loop.create_task(taskScheduler())
+        BOT.TASK = loop.create_task(taskScheduler(client))
         await BOT.TASK
         BOT.State.task_going = False
     elif data == "video":
@@ -226,7 +220,7 @@ async def handle_options(client, callback_query):
             reply_markup=keyboard,
         )
     elif data == "del-thumb":
-        if BOT.Setting.thumbnail:
+        if BOT.Setting.thumbnail and os.path.exists(Paths.THMB_PATH):
             os.remove(Paths.THMB_PATH)
         BOT.Setting.thumbnail = False
         await send_settings(client, callback_query.message, callback_query.message.id, False)
@@ -310,7 +304,7 @@ async def unzip_pswd(client, message):
 
 async def help_command(client, message):
     msg = await message.reply_text(
-        "Send /start To Check If I am alive 🤨\n\nSend /colabxr and follow prompts to start transloading 🚀\n\nSend /settings to edit bot settings ⚙️\n\nSend /setname To Set Custom File Name 📛\n\nSend /zipaswd To Set Password For Zip File 🔐\n\nSend /unzipaswd To Set Password to Extract Archives 🔓\n\n⚠️ **You can ALWAYS SEND an image To Set it as THUMBNAIL for your files 🌄**",
+        "Send /start To Check If I am alive 🤨\n\nSend /leech, /mirror etc. and follow prompts to start transloading 🚀\n\nSend /settings to edit bot settings ⚙️\n\nSend /setname To Set Custom File Name 📛\n\nSend /zipaswd To Set Password For Zip File 🔐\n\nSend /unzipaswd To Set Password to Extract Archives 🔓\n\n⚠️ **You can ALWAYS SEND an image To Set it as THUMBNAIL for your files 🌄**",
         quote=True,
         reply_markup=InlineKeyboardMarkup([
             [InlineKeyboardButton("Instructions 📖", url="https://github.com/XronTrix10/Telegram-Leecher/wiki/INSTRUCTIONS")],
