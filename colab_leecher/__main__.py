@@ -36,7 +36,7 @@ async def main():
     async with colab_bot:
         user_info = await colab_bot.get_me()
         logging.info(f"Bot started as {user_info.first_name} (@{user_info.username})")
-        await.idle()
+        await idle()
         logging.info("Bot stopped.")
 
 def add_handlers():
