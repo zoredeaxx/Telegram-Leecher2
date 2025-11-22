@@ -3,10 +3,10 @@ import logging
 import requests
 import uvloop
 
-from colab_leecher.bot import colab_bot
+from colab_leecher import bot
 
 async def main():
-    async with colab_bot:
+    async with bot.colab_bot:
         logging.info("Colab Leecher Started!")
         await asyncio.Event().wait()
 
