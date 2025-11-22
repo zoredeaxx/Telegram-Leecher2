@@ -4,7 +4,7 @@ import asyncio
 from datetime import datetime
 from asyncio import sleep, get_event_loop
 
-from pyrogram import filters
+from pyrogram import filters, idle
 from pyrogram.client import Client
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 # --- KEY CHANGE: Import the handler classes ---
