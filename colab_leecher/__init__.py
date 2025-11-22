@@ -1,6 +1,7 @@
 import logging, json
 from uvloop import install
-from pyrogram import Client
+
+colab_bot = None
 
 with open("/content/Telegram-Leecher/credentials.json", "r") as file:
     credentials = json.loads(file.read())
