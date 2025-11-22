@@ -1,6 +1,5 @@
 import logging, json
 from uvloop import install
-from pyrogram.client import Client
 
 colab_bot = None
 
@@ -14,13 +13,5 @@ OWNER = credentials["USER_ID"]
 DUMP_ID = credentials["DUMP_ID"]
 
 logging.basicConfig(level=logging.INFO)
-install()
 
-def initialize_bot():
-    global colab_bot
-    colab_bot = Client(
-        "my_bot",
-        api_id=API_ID,
-        api_hash=API_HASH,
-        bot_token=BOT_TOKEN
-    )
+install()
