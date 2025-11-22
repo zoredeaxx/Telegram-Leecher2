@@ -160,6 +160,7 @@ async def Unzip_Handler(down_path: str, remove: bool):
         shutil.rmtree(down_path)
 
 
+# --- FINAL FIX 1: This function now accepts 'bot_client' ---
 async def cancelTask(bot_client, Reason: str):
     text = f"#TASK_STOPPED\n\n**╭🔗 Source » **__[Here]({Messages.src_link})__\n**├🦄 Mode » **__{BOT.Mode.mode.capitalize()}__\n**├🤔 Reason » **__{Reason}__\n**╰🍃 Spent Time » **__{getTime((datetime.now() - BotTimes.start_time).seconds)}__"
     if BOT.State.task_going:
@@ -174,6 +175,7 @@ async def cancelTask(bot_client, Reason: str):
             BOT.State.task_going = False
             if MSG.status_msg:
                 await MSG.status_msg.delete()
+            # --- FINAL FIX 2: Use the passed 'bot_client' ---
             await bot_client.send_message(
                 chat_id=OWNER,
                 text=text,
@@ -186,6 +188,7 @@ async def cancelTask(bot_client, Reason: str):
             )
 
 
+# --- FINAL FIX 3: This function now accepts 'bot_client' ---
 async def SendLogs(bot_client, is_leech: bool):
     global Transfer, Messages, BOT, MSG, TaskError
     
