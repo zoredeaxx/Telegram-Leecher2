@@ -1,15 +1,20 @@
 import asyncio
+import os
 from datetime import datetime
 from pyrogram import Client, filters
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
-from colab_leecher import colab_bot as bot_instance_ref
+# Corrected import to get the module itself for monkey-patching
+import colab_leecher
+
+# Now import all other necessary components from your project
 from colab_leecher import API_ID, API_HASH, BOT_TOKEN, OWNER, DUMP_ID
 from colab_leecher.utility.helper import isLink, setThumbnail, message_deleter, send_settings
 from colab_leecher.utility.task_manager import task_starter, taskScheduler
 from colab_leecher.utility.handler import cancelTask
 from colab_leecher.utility.variables import BOT, MSG, BotTimes, Paths
 
+# --- CLIENT INITIALIZATION ---
 colab_bot = Client(
     "my_bot",
     api_id=API_ID,
@@ -17,7 +22,12 @@ colab_bot = Client(
     bot_token=BOT_TOKEN
 )
 
-bot_instance_ref.colab_bot = colab_bot
+# --- MONKEY-PATCHING ---
+# This correctly replaces the 'colab_bot' variable inside the 'colab_leecher' module
+colab_leecher.colab_bot = colab_bot
+
+
+# --- HANDLERS ---
 
 @colab_bot.on_message(filters.command("start") & filters.private)
 async def start(client, message):
@@ -169,7 +179,7 @@ async def handle_options(client, callback_query):
             reply_markup=keyboard)
 
     elif data == "del-thumb":
-        if BOT.Setting.thumbnail:
+        if BOT.Setting.thumbnail and os.path.exists(Paths.THMB_PATH):
             os.remove(Paths.THMB_PATH)
         BOT.Setting.thumbnail = False
         await send_settings(client, message, message.id, False)
