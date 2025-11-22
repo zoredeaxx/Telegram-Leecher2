@@ -1,7 +1,6 @@
 import logging, json
 from uvloop import install
-
-colab_bot = None
+from pyrogram import Client
 
 with open("/content/Telegram-Leecher/credentials.json", "r") as file:
     credentials = json.loads(file.read())
@@ -15,3 +14,10 @@ DUMP_ID = credentials["DUMP_ID"]
 logging.basicConfig(level=logging.INFO)
 
 install()
+
+colab_bot = Client(
+    "my_bot",
+    api_id=API_ID,
+    api_hash=API_HASH,
+    bot_token=BOT_TOKEN
+)
