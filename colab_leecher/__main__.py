@@ -7,6 +7,8 @@ from asyncio import sleep, get_event_loop
 from pyrogram import filters
 from pyrogram.client import Client
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+# --- KEY CHANGE: Import the handler classes ---
+from pyrogram.handlers import MessageHandler, CallbackQueryHandler
 
 from . import API_ID, API_HASH, BOT_TOKEN, OWNER
 from . import colab_bot
@@ -29,7 +31,6 @@ async def main():
         bot_token=BOT_TOKEN
     )
     
-    # Add all handlers to the client instance
     add_handlers()
     
     async with colab_bot:
@@ -38,24 +39,29 @@ async def main():
 
 
 def add_handlers():
+    # --- KEY CHANGE: Use MessageHandler and CallbackQueryHandler ---
+    
     # Message Handlers
-    colab_bot.add_handler(filters.command("start") & filters.private)(start)
-    colab_bot.add_handler(filters.command("leech") & filters.private)(telegram_upload)
-    colab_bot.add_handler(filters.command("mirror") & filters.private)(drive_upload)
-    colab_bot.add_handler(filters.command("dirleech") & filters.private)(directory_upload)
-    colab_bot.add_handler(filters.command("ytleech") & filters.private)(yt_upload)
-    colab_bot.add_handler(filters.command("settings") & filters.private)(settings)
-    colab_bot.add_handler(filters.command("setname") & filters.private)(custom_name)
-    colab_bot.add_handler(filters.command("zipaswd") & filters.private)(zip_pswd)
-    colab_bot.add_handler(filters.command("unzipaswd") & filters.private)(unzip_pswd)
-    colab_bot.add_handler(filters.command("help") & filters.private)(help_command)
-    colab_bot.add_handler(filters.reply)(setPrefix)
-    colab_bot.add_handler(filters.create(isLink) & ~filters.photo)(handle_url)
-    colab_bot.add_handler(filters.photo & filters.private)(handle_image)
+    colab_bot.add_handler(MessageHandler(start, filters.command("start") & filters.private))
+    colab_bot.add_handler(MessageHandler(telegram_upload, filters.command("leech") & filters.private))
+    colab_bot.add_handler(MessageHandler(drive_upload, filters.command("mirror") & filters.private))
+    colab_bot.add_handler(MessageHandler(directory_upload, filters.command("dirleech") & filters.private))
+    colab_bot.add_handler(MessageHandler(yt_upload, filters.command("ytleech") & filters.private))
+    colab_bot.add_handler(MessageHandler(settings, filters.command("settings") & filters.private))
+    colab_bot.add_handler(MessageHandler(custom_name, filters.command("setname") & filters.private))
+    colab_bot.add_handler(MessageHandler(zip_pswd, filters.command("zipaswd") & filters.private))
+    colab_bot.add_handler(MessageHandler(unzip_pswd, filters.command("unzipaswd") & filters.private))
+    colab_bot.add_handler(MessageHandler(help_command, filters.command("help") & filters.private))
+    colab_bot.add_handler(MessageHandler(setPrefix, filters.reply))
+    colab_bot.add_handler(MessageHandler(handle_url, filters.create(isLink) & ~filters.photo))
+    colab_bot.add_handler(MessageHandler(handle_image, filters.photo & filters.private))
     
     # Callback Query Handler
-    colab_bot.add_handler()(handle_options)
+    colab_bot.add_handler(CallbackQueryHandler(handle_options))
 
+
+# --- The rest of the file remains exactly the same ---
+# (All your async def functions: start, telegram_upload, etc.)
 
 src_request_msg = None
 
