@@ -5,7 +5,7 @@ from datetime import datetime
 
 # --- LOAD CREDENTIALS FROM FILE ---
 try:
-    with open("colab_leecher/credentials.json", "r") as f:
+    with open("/content/Telegram-Leecher/credentials.json", "r") as f:
         credentials = json.load(f)
     API_ID = credentials["API_ID"]
     API_HASH = credentials["API_HASH"]
