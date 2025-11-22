@@ -1,15 +1,18 @@
 import asyncio
 import logging
-from colab_leecher import colab_bot
+import requests
+import uvloop
+
+from colab_leecher.bot import colab_bot
 
 async def main():
     async with colab_bot:
-        from . import bot
         logging.info("Colab Leecher Started!")
         await asyncio.Event().wait()
 
 if __name__ == "__main__":
     try:
+        uvloop.install()
         asyncio.run(main())
     except (KeyboardInterrupt, SystemExit):
-        logging.info("Bot stopped.")
+        logging.info("Bot stopped manually.")
