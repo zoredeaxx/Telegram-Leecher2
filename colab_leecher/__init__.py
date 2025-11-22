@@ -10,7 +10,7 @@ try:
     API_ID = credentials["API_ID"]
     API_HASH = credentials["API_HASH"]
     BOT_TOKEN = credentials["BOT_TOKEN"]
-    OWNER = credentials["OWNER_ID"]
+    OWNER = credentials["USER_ID"]
     DUMP_ID = credentials["DUMP_ID"]
 except FileNotFoundError:
     logging.critical("FATAL ERROR: credentials.json not found. Please create it.")
